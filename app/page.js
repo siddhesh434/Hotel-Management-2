@@ -1,3 +1,10 @@
+import React from "react";
+import Appbar from "../components/Appbar";
+
+
 export default function Page() {
-  return <h1>My page1</h1>;
+
+
+  return <Appbar />;
+
 }
