@@ -1,9 +1,9 @@
 import CredentialsProvider from 'next-auth/providers/credentials';
-
+import GoogleProvider from 'next-auth/providers/google';
 
 export const NEXT_AUTH = {
-    // Configure one or more authentication providers
     providers: [
+        // Credentials provider (already present)
         CredentialsProvider({
             name: "Email",
             credentials: {
@@ -13,40 +13,40 @@ export const NEXT_AUTH = {
             async authorize(credentials) {
                 const user = await fetch(`${process.env.NEXTAUTH_URL}/api/all-users`, {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }).then(res => res.json()).then(data => {
-                    return data.find(user => user.email === credentials.username && user.password === credentials.password)
-                }).catch(err => {
-                    console.log(err);
-                }
-                );
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        return data.find(user => user.email === credentials.username && user.password === credentials.password);
+                    })
+                    .catch(err => console.log(err));
+
                 if (user) {
                     return user;
                 } else {
                     return null;
                 }
             },
-
         }),
-        // ...add more providers here
+        // Google provider
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
     ],
     secret: process.env.NEXTAUTH_SECRET,
-    // A database is optional, but required to persist accounts in a database
-    database: process.env.DATABASE_URL,
     callbacks: {
-        signIn: async (user, account, profile) => {
+        async signIn(user, account, profile) {
             console.log("signIn", user, account, profile);
+            const email = user.user?.email;
 
-            const email = user.user.email; // Direct access without awaiting
-
-            // If the user's email is "buddy@gmail.com", deny the sign-in
+            // Deny sign-in for specific email
             if (email === "buddy@gmail.com") {
                 console.log("Denied login for buddy@gmail.com");
-                return false; // Prevent sign-in for this user
+                return false;
             }
-            return true; // Allow sign-in for all other users
+            return true;
         },
-    }
-}
+    },
+    database: process.env.DATABASE_URL,
+};

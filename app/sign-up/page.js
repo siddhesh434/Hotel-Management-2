@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 
@@ -96,12 +97,23 @@ export default function SignUp() {
 
                 <p className="mt-6 text-sm text-center text-gray-600">
                     Already have an account?{" "}
-                    <a onClick={() => {
-                        signIn();
-                    }} className="text-indigo-600 hover:underline">
+                    <a
+                        onClick={() => signIn()}
+                        className="text-indigo-600 hover:underline cursor-pointer"
+                    >
                         Log in
                     </a>
                 </p>
+
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-600">Or sign in with</p>
+                    <button
+                        onClick={() => signIn("google")}
+                        className="mt-2 w-full py-2 px-4 bg-red-600 text-white font-semibold rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    >
+                        Sign in with Google
+                    </button>
+                </div>
             </div>
         </div>
     );
